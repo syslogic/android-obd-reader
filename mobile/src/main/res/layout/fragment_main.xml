@@ -19,7 +19,7 @@
                 android:layout_weight="2"
                 android:tag="SPEED"
                 android:text="@string/text_zero"
-                android:textSize="@dimen/abc_text_size_display_3_material" />
+                android:textSize="@dimen/text_size_display_3_material" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/compass_text"
@@ -28,7 +28,7 @@
                 android:layout_weight="1"
                 android:gravity="end"
                 android:text="@string/text_orientation_default"
-                android:textSize="@dimen/abc_text_size_display_3_material" />
+                android:textSize="@dimen/text_size_display_3_material" />
 
         </TableRow>
 
@@ -92,7 +92,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/text_gps"
-                android:textSize="@dimen/abc_text_size_medium_material" />
+                android:textSize="@dimen/text_size_medium_material" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
@@ -100,7 +100,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/text_bluetooth"
-                android:textSize="@dimen/abc_text_size_medium_material" />
+                android:textSize="@dimen/text_size_medium_material" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:layout_width="0dp"
@@ -108,7 +108,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="@string/text_obd"
-                android:textSize="@dimen/abc_text_size_medium_material" />
+                android:textSize="@dimen/text_size_medium_material" />
 
         </TableRow>
 

@@ -24,6 +24,7 @@ import com.github.pires.obd.reader.R;
 import com.github.pires.obd.reader.activity.ConfigActivity;
 import com.github.pires.obd.reader.activity.MainActivity;
 import com.github.pires.obd.reader.io.ObdCommandJob.ObdCommandJobState;
+
 import com.google.inject.Inject;
 
 import java.io.File;

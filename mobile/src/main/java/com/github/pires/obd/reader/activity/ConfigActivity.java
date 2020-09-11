@@ -1,10 +1,12 @@
 package com.github.pires.obd.reader.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
@@ -18,6 +20,8 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceScreen;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.enums.ObdProtocols;
@@ -319,6 +323,16 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
     }
 
     private void checkGps() {
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            // public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+
         LocationManager mLocService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         if (mLocService != null) {
             LocationProvider mLocProvider = mLocService.getProvider(LocationManager.GPS_PROVIDER);
