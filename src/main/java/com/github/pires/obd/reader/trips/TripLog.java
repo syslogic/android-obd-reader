@@ -19,16 +19,21 @@ public class TripLog {
 
     /// the database version number
     public static final int DATABASE_VERSION = 1;
+
     /// the name of the database
     public static final String DATABASE_NAME = "tripslog.db";
+
     /// a tag string for debug logging (the name of this class)
     private static final String TAG = TripLog.class.getName();
+
     /// database table names
     private static final String RECORDS_TABLE = "Records";
+
     /// SQL commands to delete the database
     public static final String[] DATABASE_DELETE = new String[]{
             "drop table if exists " + RECORDS_TABLE + ";",
     };
+
     /// column names for RECORDS_TABLE
     private static final String RECORD_ID = "id";
     private static final String RECORD_START_DATE = "startDate";
@@ -36,6 +41,7 @@ public class TripLog {
     private static final String RECORD_RPM_MAX = "rmpMax";
     private static final String RECORD_SPEED_MAX = "speedMax";
     private static final String RECORD_ENGINE_RUNTIME = "engineRuntime";
+
     /// SQL commands to create the database
     public static final String[] DATABASE_CREATE = new String[]{
             "create table " + RECORDS_TABLE + " ( " +
@@ -45,8 +51,9 @@ public class TripLog {
                     RECORD_SPEED_MAX + " integer, " +
                     RECORD_RPM_MAX + " integer, " +
                     RECORD_ENGINE_RUNTIME + " text" +
-                    ");"
+            ");"
     };
+
     /// array of all column names for RECORDS_TABLE
     private static final String[] RECORDS_TABLE_COLUMNS = new String[]{
             RECORD_ID,
@@ -56,12 +63,16 @@ public class TripLog {
             RECORD_ENGINE_RUNTIME,
             RECORD_RPM_MAX
     };
+
     /// singleton instance
     private static TripLog instance;
+
     /// context of the instance creator
     private final Context context;
+
     /// a helper instance used to open and close the database
     private final TripLogOpenHelper helper;
+
     /// the database
     private final SQLiteDatabase db;
 
@@ -178,14 +189,7 @@ public class TripLog {
 
         try {
             String orderBy = RECORD_START_DATE;
-            cursor = db.query(
-                    RECORDS_TABLE,
-                    RECORDS_TABLE_COLUMNS,
-                    null,
-                    null, null, null,
-                    orderBy,
-                    null
-            );
+            cursor = db.query(RECORDS_TABLE, RECORDS_TABLE_COLUMNS,null,null, null, null, orderBy, null);
 
             // create a list of TripRecords from the data
             if (cursor != null) {

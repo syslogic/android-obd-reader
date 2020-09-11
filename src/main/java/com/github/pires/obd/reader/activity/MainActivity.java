@@ -1,5 +1,6 @@
 package com.github.pires.obd.reader.activity;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -10,6 +11,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -36,6 +38,8 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.core.app.ActivityCompat;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
@@ -67,6 +71,7 @@ import java.util.Map;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
+
 import roboguice.RoboGuice;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
@@ -195,7 +200,7 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
                     Map<String, String> temp = new HashMap<String, String>();
                     temp.putAll(commandResult);
                     ObdReading reading = new ObdReading(lat, lon, alt, System.currentTimeMillis(), vin, temp);
-                    if(reading != null) myCSVWriter.writeLineCSV(reading);
+                    if (reading != null) myCSVWriter.writeLineCSV(reading);
                 }
                 commandResult.clear();
             }
@@ -272,7 +277,7 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
             cmdResult = getString(R.string.status_obd_no_support);
         } else {
             cmdResult = job.getCommand().getFormattedResult();
-            if(isServiceBound)
+            if (isServiceBound)
                 obdStatusTextView.setText(getString(R.string.status_obd_data));
         }
 
@@ -289,6 +294,16 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
         if (mLocService != null) {
             mLocProvider = mLocService.getProvider(LocationManager.GPS_PROVIDER);
             if (mLocProvider != null) {
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                    // TODO: Consider calling
+                    //    ActivityCompat#requestPermissions
+                    // here to request the missing permissions, and then overriding
+                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                    //                                          int[] grantResults)
+                    // to handle the case where the user grants the permission. See the documentation
+                    // for ActivityCompat#requestPermissions for more details.
+                    return false;
+                }
                 mLocService.addGpsStatusListener(this);
                 if (mLocService.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     gpsStatusTextView.setText(getString(R.string.status_gps_ready));
@@ -336,7 +351,7 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
 
         // create a log instance for use by this application
         triplog = TripLog.getInstance(this.getApplicationContext());
-        
+
         obdStatusTextView.setText(getString(R.string.status_obd_disconnected));
     }
 
@@ -385,10 +400,8 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "Resuming..");
-        sensorManager.registerListener(orientListener, orientSensor,
-                SensorManager.SENSOR_DELAY_UI);
-        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK,
-                "ObdReader");
+        sensorManager.registerListener(orientListener, orientSensor, SensorManager.SENSOR_DELAY_UI);
+        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "ObdReader:wakelock");
 
         // get Bluetooth device
         final BluetoothAdapter btAdapter = BluetoothAdapter
@@ -678,6 +691,16 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
 
     private synchronized void gpsStart() {
         if (!mGpsIsStarted && mLocProvider != null && mLocService != null && mLocService.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                // TODO: Consider calling
+                //    ActivityCompat#requestPermissions
+                // here to request the missing permissions, and then overriding
+                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                //                                          int[] grantResults)
+                // to handle the case where the user grants the permission. See the documentation
+                // for ActivityCompat#requestPermissions for more details.
+                return;
+            }
             mLocService.requestLocationUpdates(mLocProvider.getName(), getGpsUpdatePeriod(prefs), getGpsDistanceUpdatePeriod(prefs), this);
             mGpsIsStarted = true;
         } else {

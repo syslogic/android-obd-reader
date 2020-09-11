@@ -9,6 +9,7 @@ import android.util.Log;
  * Created by elagin on 13.03.15.
  */
 public class TripLogOpenHelper extends SQLiteOpenHelper {
+
     /// tag for logging
     private static final String TAG = TripLogOpenHelper.class.getName();
 

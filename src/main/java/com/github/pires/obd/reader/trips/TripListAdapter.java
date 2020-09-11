@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 public class TripListAdapter extends ArrayAdapter<TripRecord> {
+
     /// the Android Activity owning the ListView
     private final Activity activity;
 

@@ -148,8 +148,6 @@ public class ObdGatewayService extends AbstractGatewayService {
 
         queueCounter = 0L;
         Log.d(TAG, "Initialization jobs queued.");
-
-
     }
 
     /**

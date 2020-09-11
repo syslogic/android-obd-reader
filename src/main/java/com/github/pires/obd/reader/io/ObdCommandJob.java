@@ -1,6 +1,3 @@
-/*
- * TODO put header
- */
 package com.github.pires.obd.reader.io;
 
 import com.github.pires.obd.commands.ObdCommand;

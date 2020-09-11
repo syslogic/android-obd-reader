@@ -20,6 +20,7 @@ import java.util.Map;
  * DTO for OBD readings.
  */
 public class ObdReading {
+
     private double latitude, longitude, altitude;
     private long timestamp;
     private String vin; // vehicle id
