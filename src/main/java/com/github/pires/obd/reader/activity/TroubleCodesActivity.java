@@ -177,7 +177,7 @@ public class TroubleCodesActivity extends Activity {
                     );
                 }
                 gtct.closeSocket(sock);
-                // Refresh main activity upon close of dialog box
+                // Refresh fragment_main activity upon close of dialog box
                 Intent refresh = new Intent(this, TroubleCodesActivity.class);
                 startActivity(refresh);
                 this.finish(); //
@@ -389,7 +389,7 @@ public class TroubleCodesActivity extends Activity {
 
 
             mHandler.obtainMessage(DATA_OK, result).sendToTarget();
-            setContentView(R.layout.trouble_codes);
+            setContentView(R.layout.fragment_trouble_codes);
 
         }
     }

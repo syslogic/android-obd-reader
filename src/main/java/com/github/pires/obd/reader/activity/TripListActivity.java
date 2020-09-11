@@ -35,7 +35,7 @@ public class TripListActivity extends RoboActivity implements ConfirmDialog.List
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_trips_list);
+        setContentView(R.layout.fragment_trips);
 
         ListView lv = (ListView) findViewById(R.id.tripList);
 

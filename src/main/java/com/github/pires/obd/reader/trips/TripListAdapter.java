@@ -28,7 +28,7 @@ public class TripListAdapter extends ArrayAdapter<TripRecord> {
      * @param records  - the List of TripRecord instances for display in the ListView.
      */
     public TripListAdapter(Activity activity, List<TripRecord> records) {
-        super(activity, R.layout.row_trip_list, records);
+        super(activity, R.layout.item_trip, records);
         this.activity = activity;
         this.records = records;
     }
@@ -46,7 +46,7 @@ public class TripListAdapter extends ArrayAdapter<TripRecord> {
         // create a view for the row if it doesn't already exist
         if (view == null) {
             LayoutInflater inflater = activity.getLayoutInflater();
-            view = inflater.inflate(R.layout.row_trip_list, null);
+            view = inflater.inflate(R.layout.item_trip, null);
         }
 
         // get widgets from the view
