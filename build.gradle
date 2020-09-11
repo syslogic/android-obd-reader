@@ -37,14 +37,14 @@ allprojects {
 }
 
 apply plugin: "com.android.application"
-// apply plugin: "com.google.firebase.appdistribution"
+apply plugin: "com.google.firebase.appdistribution"
 apply plugin: "com.google.firebase.firebase-perf"
 
 android {
-    compileSdkVersion 30
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 29
+        compileSdkVersion 29
         applicationId 'com.github.pires.obd.reader'
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -70,9 +70,9 @@ android {
 dependencies {
     implementation "androidx.appcompat:appcompat:1.2.0"
     implementation "com.github.pires:obd-java-api:1.0-RC16"
-    implementation "com.squareup.retrofit:retrofit:1.9.0"
 
     // TODO: get rid of these:
+    implementation "com.squareup.retrofit:retrofit:1.9.0"
     implementation "org.roboguice:roboguice:3.0.1"
     compileOnly "org.roboguice:roboblender:3.0.1"
 

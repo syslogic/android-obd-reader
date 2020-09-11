@@ -33,12 +33,13 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.ViewGroup.MarginLayoutParams;
-import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
 
 import com.github.pires.obd.commands.ObdCommand;
@@ -117,7 +118,8 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
     private TripRecord currentTrip;
 
     @InjectView(R.id.compass_text)
-    private TextView compass;
+    private AppCompatTextView compass;
+
     private final SensorEventListener orientListener = new SensorEventListener() {
 
         public void onSensorChanged(SensorEvent event) {
@@ -148,23 +150,33 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
         }
     };
     @InjectView(R.id.BT_STATUS)
-    private TextView btStatusTextView;
+    private AppCompatTextView btStatusTextView;
+
     @InjectView(R.id.OBD_STATUS)
-    private TextView obdStatusTextView;
+    private AppCompatTextView obdStatusTextView;
+
     @InjectView(R.id.GPS_POS)
-    private TextView gpsStatusTextView;
+    private AppCompatTextView gpsStatusTextView;
+
     @InjectView(R.id.vehicle_view)
-    private LinearLayout vv;
+    private LinearLayoutCompat vv;
+
     @InjectView(R.id.data_table)
     private TableLayout tl;
+
     @Inject
     private SensorManager sensorManager;
+
     @Inject
     private PowerManager powerManager;
+
     @Inject
     private SharedPreferences prefs;
+
     private boolean isServiceBound;
+
     private AbstractGatewayService service;
+
     private final Runnable mQueueCommands = new Runnable() {
         public void run() {
             if (service != null && service.isRunning() && service.queueEmpty()) {
