@@ -195,9 +195,9 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-    /*
-     * Read preferences resources available at res/xml/preferences.xml
-     */
+        /*
+         * Read preferences resources available at res/xml/preferences.xml
+         */
         addPreferencesFromResource(R.xml.preferences);
 
         checkGps();
@@ -217,11 +217,11 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
             txtPref.setOnPreferenceChangeListener(this);
         }
 
-    /*
-     * Available OBD commands
-     *
-     * TODO This should be read from preferences database
-     */
+        /*
+         * Available OBD commands
+         *
+         * TODO This should be read from preferences database
+         */
         ArrayList<ObdCommand> cmds = ObdConfig.getCommands();
         PreferenceScreen cmdScr = (PreferenceScreen) getPreferenceScreen()
                 .findPreference(COMMANDS_SCREEN_KEY);
@@ -233,20 +233,20 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
             cmdScr.addPreference(cpref);
         }
 
-    /*
-     * Available OBD protocols
-     *
-     */
+        /*
+         * Available OBD protocols
+         *
+         */
         for (ObdProtocols protocol : ObdProtocols.values()) {
             protocolStrings.add(protocol.name());
         }
         listProtocols.setEntries(protocolStrings.toArray(new CharSequence[0]));
         listProtocols.setEntryValues(protocolStrings.toArray(new CharSequence[0]));
 
-    /*
-     * Let's use this device Bluetooth adapter to select which paired OBD-II
-     * compliant device we'll use.
-     */
+        /*
+         * Let's use this device Bluetooth adapter to select which paired OBD-II
+         * compliant device we'll use.
+         */
         final BluetoothAdapter mBtAdapter = BluetoothAdapter.getDefaultAdapter();
         if (mBtAdapter == null) {
             listBtDevices
@@ -260,11 +260,11 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
             return;
         }
 
-    /*
-     * Listen for preferences click.
-     *
-     * TODO there are so many repeated validations :-/
-     */
+        /*
+         * Listen for preferences click.
+         *
+         * TODO there are so many repeated validations :-/
+         */
         final Activity thisActivity = this;
         listBtDevices.setEntries(new CharSequence[1]);
         listBtDevices.setEntryValues(new CharSequence[1]);
@@ -281,9 +281,9 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
             }
         });
 
-    /*
-     * Get paired devices and populate preference list.
-     */
+        /*
+         * Get paired devices and populate preference list.
+         */
         Set<BluetoothDevice> pairedDevices = mBtAdapter.getBondedDevices();
         if (pairedDevices.size() > 0) {
             for (BluetoothDevice device : pairedDevices) {
@@ -347,7 +347,7 @@ public class ConfigActivity extends PreferenceActivity implements OnPreferenceCh
         PreferenceCategory preferenceCategory = (PreferenceCategory) findPreference(getResources().getString(R.string.pref_gps_category));
         if (preferenceCategory != null) {
             preferenceCategory.removeAll();
-            preferenceScreen.removePreference((Preference) preferenceCategory);
+            preferenceScreen.removePreference(preferenceCategory);
         }
     }
 }
