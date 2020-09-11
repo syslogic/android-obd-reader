@@ -13,7 +13,9 @@ android {
         testBuildType "debug"
     }
 
-    dataBinding { enabled = true }
+    buildFeatures {
+        dataBinding = true
+    }
 
     lintOptions {
         lintConfig file("../lint.xml")
