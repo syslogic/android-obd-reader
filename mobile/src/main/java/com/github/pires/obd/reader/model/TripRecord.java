@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.trips;
+package com.github.pires.obd.reader.model;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

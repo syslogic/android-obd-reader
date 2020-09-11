@@ -10,9 +10,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.github.pires.obd.reader.R;
-import com.github.pires.obd.reader.trips.TripListAdapter;
-import com.github.pires.obd.reader.trips.TripLog;
-import com.github.pires.obd.reader.trips.TripRecord;
+import com.github.pires.obd.reader.adapter.TripListAdapter;
+import com.github.pires.obd.reader.database.TripLog;
+import com.github.pires.obd.reader.model.TripRecord;
 
 import java.util.List;
 

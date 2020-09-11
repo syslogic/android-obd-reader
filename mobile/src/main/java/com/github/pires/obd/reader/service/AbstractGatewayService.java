@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.io;
+package com.github.pires.obd.reader.service;
 
 import android.app.Notification;
 import android.app.NotificationManager;

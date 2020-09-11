@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.io;
+package com.github.pires.obd.reader.service;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -91,11 +91,7 @@ public class ObdGatewayService extends AbstractGatewayService {
             try {
                 startObdConnection();
             } catch (Exception e) {
-                Log.e(
-                        TAG,
-                        "There was an error while establishing connection. -> "
-                                + e.getMessage()
-                );
+                Log.e(TAG,"There was an error while establishing connection. -> " + e.getMessage());
 
                 // in case of failure, stop this service.
                 stopService();

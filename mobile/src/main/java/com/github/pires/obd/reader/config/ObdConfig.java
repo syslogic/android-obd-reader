@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.io;
+package com.github.pires.obd.reader.config;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;

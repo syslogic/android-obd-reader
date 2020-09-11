@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.trips;
+package com.github.pires.obd.reader.adapter;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -8,6 +8,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.github.pires.obd.reader.R;
+import com.github.pires.obd.reader.model.TripRecord;
 
 import java.util.Date;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.trips;
+package com.github.pires.obd.reader.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteConstraintException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
+
+import com.github.pires.obd.reader.model.TripRecord;
 
 import java.util.ArrayList;
 import java.util.Date;

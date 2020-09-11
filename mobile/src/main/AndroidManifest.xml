@@ -46,11 +46,11 @@
             android:label="@string/title_activity_trips_list"></activity>
 
         <service
-            android:name="com.github.pires.obd.reader.io.ObdGatewayService"
+            android:name="com.github.pires.obd.reader.service.ObdGatewayService"
             android:launchMode="singleInstance"
             android:exported="false" />
         <service
-            android:name="com.github.pires.obd.reader.io.MockObdGatewayService"
+            android:name="com.github.pires.obd.reader.service.MockObdGatewayService"
             android:launchMode="singleInstance"
             android:exported="false" />
     </application>
