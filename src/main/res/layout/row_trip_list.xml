@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -29,16 +31,18 @@
         android:id="@+id/rowEngine"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="15dp"
-        android:singleLine="true" />
+        android:gravity="start"
+        android:paddingStart="15dp"
+        android:singleLine="true"
+        tools:ignore="RtlSymmetry" />
 
     <TextView
         android:id="@+id/rowOther"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:paddingLeft="15dp"
-        android:singleLine="true" />
+        android:gravity="start"
+        android:paddingStart="15dp"
+        android:singleLine="true"
+        tools:ignore="RtlSymmetry" />
 
 </LinearLayout>
