@@ -11,7 +11,7 @@
  * the License.
  */
 
-package com.github.pires.obd.reader.net;
+package com.github.pires.obd.reader.model;
 
 import java.util.HashMap;
 import java.util.Map;

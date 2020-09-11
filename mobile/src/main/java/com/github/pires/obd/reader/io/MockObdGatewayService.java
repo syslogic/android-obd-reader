@@ -10,7 +10,8 @@ import com.github.pires.obd.commands.protocol.TimeoutCommand;
 import com.github.pires.obd.commands.temperature.AmbientAirTemperatureCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 import com.github.pires.obd.reader.activity.MainActivity;
-import com.github.pires.obd.reader.io.ObdCommandJob.ObdCommandJobState;
+import com.github.pires.obd.reader.model.ObdCommandJob;
+import com.github.pires.obd.reader.model.ObdCommandJob.ObdCommandJobState;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

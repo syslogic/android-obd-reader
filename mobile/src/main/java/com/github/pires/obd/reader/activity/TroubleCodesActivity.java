@@ -33,7 +33,7 @@ import com.github.pires.obd.exceptions.MisunderstoodCommandException;
 import com.github.pires.obd.exceptions.NoDataException;
 import com.github.pires.obd.exceptions.UnableToConnectException;
 import com.github.pires.obd.reader.R;
-import com.github.pires.obd.reader.io.BluetoothManager;
+import com.github.pires.obd.reader.utils.BluetoothManager;
 import com.google.inject.Inject;
 
 import java.io.IOException;

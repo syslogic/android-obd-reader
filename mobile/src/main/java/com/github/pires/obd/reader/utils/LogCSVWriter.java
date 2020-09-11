@@ -1,9 +1,9 @@
-package com.github.pires.obd.reader.io;
+package com.github.pires.obd.reader.utils;
 
 import android.os.Environment;
 import android.util.Log;
 
-import com.github.pires.obd.reader.net.ObdReading;
+import com.github.pires.obd.reader.model.ObdReading;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,7 +38,7 @@ public class LogCSVWriter {
         try{
             File sdCard = Environment.getExternalStorageDirectory();
             File dir = new File(sdCard.getAbsolutePath() + File.separator + dirname);
-            if (!dir.exists()) dir.mkdirs();
+            if (!dir.exists()) {dir.mkdirs();}
             Log.d(TAG, "Path is " + sdCard.getAbsolutePath() + File.separator + dirname);
             File file = new File(dir, filename);
             FileOutputStream fos = new FileOutputStream(file);

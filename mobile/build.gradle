@@ -40,7 +40,6 @@ dependencies {
     implementation "com.github.pires:obd-java-api:1.0-RC16"
 
     // TODO: get rid of these:
-    implementation "com.squareup.retrofit:retrofit:1.9.0"
     implementation "org.roboguice:roboguice:3.0.1"
     compileOnly "org.roboguice:roboblender:3.0.1"
 

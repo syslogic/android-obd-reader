@@ -1,6 +1,7 @@
 package com.github.pires.obd.reader.activity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -21,7 +22,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -47,17 +47,15 @@ import com.github.pires.obd.commands.SpeedCommand;
 import com.github.pires.obd.commands.engine.RPMCommand;
 import com.github.pires.obd.commands.engine.RuntimeCommand;
 import com.github.pires.obd.enums.AvailableCommandNames;
-import com.github.pires.obd.reader.BuildConfig;
 import com.github.pires.obd.reader.R;
-import com.github.pires.obd.reader.config.ObdConfig;
+import com.github.pires.obd.reader.io.ObdConfig;
 import com.github.pires.obd.reader.io.AbstractGatewayService;
-import com.github.pires.obd.reader.io.LogCSVWriter;
+import com.github.pires.obd.reader.utils.LogCSVWriter;
 import com.github.pires.obd.reader.io.MockObdGatewayService;
-import com.github.pires.obd.reader.io.ObdCommandJob;
+import com.github.pires.obd.reader.model.ObdCommandJob;
 import com.github.pires.obd.reader.io.ObdGatewayService;
-import com.github.pires.obd.reader.io.ObdProgressListener;
-import com.github.pires.obd.reader.net.ObdReading;
-import com.github.pires.obd.reader.net.ObdService;
+import com.github.pires.obd.reader.interfaces.ObdProgressListener;
+import com.github.pires.obd.reader.model.ObdReading;
 import com.github.pires.obd.reader.trips.TripLog;
 import com.github.pires.obd.reader.trips.TripRecord;
 import com.google.inject.Inject;
@@ -70,10 +68,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 import roboguice.RoboGuice;
 import roboguice.activity.RoboActivity;
 import roboguice.inject.ContentView;
@@ -82,8 +76,10 @@ import roboguice.inject.InjectView;
 import static com.github.pires.obd.reader.activity.ConfigActivity.getGpsDistanceUpdatePeriod;
 import static com.github.pires.obd.reader.activity.ConfigActivity.getGpsUpdatePeriod;
 
-// Some code taken from https://github.com/barbeau/gpstest
-
+/**
+ * MainActivity
+ * TODO: Ask for permission ACCESS_FINE_LOCATION.
+**/
 @ContentView(R.layout.fragment_main)
 public class MainActivity extends RoboActivity implements ObdProgressListener, LocationListener, GpsStatus.Listener {
 
@@ -191,30 +187,31 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
                     lon = mLastLocation.getLongitude();
                     alt = mLastLocation.getAltitude();
 
-                    StringBuilder sb = new StringBuilder();
-                    sb.append("Lat: ");
-                    sb.append(String.valueOf(mLastLocation.getLatitude()).substring(0, posLen));
-                    sb.append(" Lon: ");
-                    sb.append(String.valueOf(mLastLocation.getLongitude()).substring(0, posLen));
-                    sb.append(" Alt: ");
-                    sb.append(String.valueOf(mLastLocation.getAltitude()));
-                    gpsStatusTextView.setText(sb.toString());
+                    String sb = "Lat: " +
+                            String.valueOf(mLastLocation.getLatitude()).substring(0, posLen) +
+                            " Lon: " +
+                            String.valueOf(mLastLocation.getLongitude()).substring(0, posLen) +
+                            " Alt: " +
+                            String.valueOf(mLastLocation.getAltitude());
+                    gpsStatusTextView.setText(sb);
                 }
+
                 if (prefs.getBoolean(ConfigActivity.UPLOAD_DATA_KEY, false)) {
+
                     // Upload the current reading by http
                     final String vin = prefs.getString(ConfigActivity.VEHICLE_ID_KEY, "UNDEFINED_VIN");
-                    Map<String, String> temp = new HashMap<String, String>();
-                    temp.putAll(commandResult);
+                    Map<String, String> temp = new HashMap<>(commandResult);
                     ObdReading reading = new ObdReading(lat, lon, alt, System.currentTimeMillis(), vin, temp);
-                    new UploadAsyncTask().execute(reading);
+
+                    // UploadAsyncTask removed; not required with Firebase.
+                    // new UploadAsyncTask().execute(reading);
 
                 } else if (prefs.getBoolean(ConfigActivity.ENABLE_FULL_LOGGING_KEY, false)) {
                     // Write the current reading to CSV
                     final String vin = prefs.getString(ConfigActivity.VEHICLE_ID_KEY, "UNDEFINED_VIN");
-                    Map<String, String> temp = new HashMap<String, String>();
-                    temp.putAll(commandResult);
+                    Map<String, String> temp = new HashMap<>(commandResult);
                     ObdReading reading = new ObdReading(lat, lon, alt, System.currentTimeMillis(), vin, temp);
-                    if (reading != null) myCSVWriter.writeLineCSV(reading);
+                    myCSVWriter.writeLineCSV(reading);
                 }
                 commandResult.clear();
             }
@@ -309,23 +306,16 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
 
     private boolean gpsInit() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            // public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
-            return false;
-        }
-
-        mLocService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (mLocService != null) {
-            mLocProvider = mLocService.getProvider(LocationManager.GPS_PROVIDER);
-            if (mLocProvider != null) {
-                mLocService.addGpsStatusListener(this);
-                if (mLocService.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-                    gpsStatusTextView.setText(getString(R.string.status_gps_ready));
-                    return true;
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mLocService = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            if (mLocService != null) {
+                mLocProvider = mLocService.getProvider(LocationManager.GPS_PROVIDER);
+                if (mLocProvider != null) {
+                    mLocService.addGpsStatusListener(this);
+                    if (mLocService.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+                        gpsStatusTextView.setText(getString(R.string.status_gps_ready));
+                        return true;
+                    }
                 }
             }
         }
@@ -412,27 +402,25 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
     protected void onPause() {
         super.onPause();
         Log.d(TAG, "Pausing..");
-        releaseWakeLockIfHeld();
+        // releaseWakeLockIfHeld();
     }
 
     /**
      * If lock is held, release. Lock will be held when the service is running.
      */
     private void releaseWakeLockIfHeld() {
-        if (wakeLock.isHeld())
-            wakeLock.release();
+        if (wakeLock.isHeld()) {wakeLock.release();}
     }
 
     protected void onResume() {
         super.onResume();
+
         Log.d(TAG, "Resuming..");
         sensorManager.registerListener(orientListener, orientSensor, SensorManager.SENSOR_DELAY_UI);
-        wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "ObdReader:wakelock");
+        // wakeLock = powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "ObdReader:wakelock");
 
         // get Bluetooth device
-        final BluetoothAdapter btAdapter = BluetoothAdapter
-                .getDefaultAdapter();
-
+        final BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
         preRequisites = btAdapter != null && btAdapter.isEnabled();
         if (!preRequisites && prefs.getBoolean(ConfigActivity.ENABLE_BT_KEY, false)) {
             preRequisites = btAdapter != null && btAdapter.enable();
@@ -611,6 +599,7 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
         return true;
     }
 
+    @SuppressLint("SetTextI18n")
     private void addTableRow(String id, String key, String val) {
 
         TableRow tr = new TableRow(this);
@@ -621,10 +610,10 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
         tr.setLayoutParams(params);
 
         TextView name = new TextView(this);
-        name.setGravity(Gravity.RIGHT);
+        name.setGravity(Gravity.END);
         name.setText(key + ": ");
         TextView value = new TextView(this);
-        value.setGravity(Gravity.LEFT);
+        value.setGravity(Gravity.START);
         value.setText(val);
         value.setTag(id);
         tr.addView(name);
@@ -717,18 +706,10 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
 
     private synchronized void gpsStart() {
         if (!mGpsIsStarted && mLocProvider != null && mLocService != null && mLocService.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                // TODO: Consider calling
-                //    ActivityCompat#requestPermissions
-                // here to request the missing permissions, and then overriding
-                //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                //                                          int[] grantResults)
-                // to handle the case where the user grants the permission. See the documentation
-                // for ActivityCompat#requestPermissions for more details.
-                return;
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                mLocService.requestLocationUpdates(mLocProvider.getName(), getGpsUpdatePeriod(prefs), getGpsDistanceUpdatePeriod(prefs), this);
+                mGpsIsStarted = true;
             }
-            mLocService.requestLocationUpdates(mLocProvider.getName(), getGpsUpdatePeriod(prefs), getGpsDistanceUpdatePeriod(prefs), this);
-            mGpsIsStarted = true;
         } else {
             gpsStatusTextView.setText(getString(R.string.status_gps_no_support));
         }
@@ -740,39 +721,5 @@ public class MainActivity extends RoboActivity implements ObdProgressListener, L
             mGpsIsStarted = false;
             gpsStatusTextView.setText(getString(R.string.status_gps_stopped));
         }
-    }
-
-
-    /**
-     * Uploading asynchronous task
-     */
-    @Deprecated
-    private class UploadAsyncTask extends AsyncTask<ObdReading, Void, Void> {
-
-        @Override
-        protected Void doInBackground(ObdReading... readings) {
-
-            Log.d(TAG, "Uploading " + readings.length + " readings..");
-
-            // instantiate reading service client
-            final String endpoint = prefs.getString(ConfigActivity.UPLOAD_URL_KEY, "");
-            RestAdapter restAdapter = new RestAdapter.Builder().setEndpoint(endpoint).build();
-            ObdService service = restAdapter.create(ObdService.class);
-            // upload readings
-            for (ObdReading reading : readings) {
-                try {
-                    Response response = service.uploadReading(reading);
-                    if (BuildConfig.DEBUG && response.getStatus() != 200) {
-                        throw new AssertionError("Assertion failed");
-                    }
-                } catch (RetrofitError re) {
-                    Log.e(TAG, re.toString());
-                }
-
-            }
-            Log.d(TAG, "Done");
-            return null;
-        }
-
     }
 }

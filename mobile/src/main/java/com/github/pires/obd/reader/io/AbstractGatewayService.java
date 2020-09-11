@@ -12,6 +12,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import com.github.pires.obd.reader.activity.MainActivity;
+import com.github.pires.obd.reader.model.ObdCommandJob;
 import com.google.inject.Inject;
 
 import java.io.IOException;
@@ -20,8 +21,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import roboguice.service.RoboService;
 
-
 public abstract class AbstractGatewayService extends RoboService {
+
     public static final int NOTIFICATION_ID = 1;
     private static final String TAG = AbstractGatewayService.class.getName();
     private final IBinder binder = new AbstractGatewayServiceBinder();
@@ -31,6 +32,7 @@ public abstract class AbstractGatewayService extends RoboService {
     protected boolean isRunning = false;
     protected Long queueCounter = 0L;
     protected BlockingQueue<ObdCommandJob> jobsQueue = new LinkedBlockingQueue<>();
+
     // Run the executeQueue in a different thread to lighten the UI thread
     Thread t = new Thread(new Runnable() {
         @Override
@@ -103,12 +105,14 @@ public abstract class AbstractGatewayService extends RoboService {
                 .setContentText(contentText).setSmallIcon(icon)
                 .setContentIntent(contentIntent)
                 .setWhen(System.currentTimeMillis());
+
         // can cancel?
         if (ongoing) {
             notificationBuilder.setOngoing(true);
         } else {
             notificationBuilder.setAutoCancel(true);
         }
+
         if (vibrate) {
             notificationBuilder.setDefaults(Notification.DEFAULT_VIBRATE);
         }

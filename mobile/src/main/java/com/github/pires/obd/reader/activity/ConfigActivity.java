@@ -26,7 +26,7 @@ import androidx.core.app.ActivityCompat;
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.enums.ObdProtocols;
 import com.github.pires.obd.reader.R;
-import com.github.pires.obd.reader.config.ObdConfig;
+import com.github.pires.obd.reader.io.ObdConfig;
 
 import java.util.ArrayList;
 import java.util.Set;

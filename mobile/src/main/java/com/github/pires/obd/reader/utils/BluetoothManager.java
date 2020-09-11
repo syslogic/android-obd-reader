@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.io;
+package com.github.pires.obd.reader.utils;
 
 import java.io.IOException;
 import java.lang.reflect.Method;

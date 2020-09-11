@@ -23,8 +23,10 @@ import com.github.pires.obd.exceptions.UnsupportedCommandException;
 import com.github.pires.obd.reader.R;
 import com.github.pires.obd.reader.activity.ConfigActivity;
 import com.github.pires.obd.reader.activity.MainActivity;
-import com.github.pires.obd.reader.io.ObdCommandJob.ObdCommandJobState;
+import com.github.pires.obd.reader.model.ObdCommandJob;
+import com.github.pires.obd.reader.model.ObdCommandJob.ObdCommandJobState;
 
+import com.github.pires.obd.reader.utils.BluetoothManager;
 import com.google.inject.Inject;
 
 import java.io.File;
@@ -67,20 +69,20 @@ public class ObdGatewayService extends AbstractGatewayService {
             dev = btAdapter.getRemoteDevice(remoteDevice);
 
 
-    /*
-     * Establish Bluetooth connection
-     *
-     * Because discovery is a heavyweight procedure for the Bluetooth adapter,
-     * this method should always be called before attempting to connect to a
-     * remote device with connect(). Discovery is not managed by the Activity,
-     * but is run as a system service, so an application should always call
-     * cancel discovery even if it did not directly request a discovery, just to
-     * be sure. If Bluetooth state is not STATE_ON, this API will return false.
-     *
-     * see
-     * http://developer.android.com/reference/android/bluetooth/BluetoothAdapter
-     * .html#cancelDiscovery()
-     */
+            /*
+             * Establish Bluetooth connection
+             *
+             * Because discovery is a heavyweight procedure for the Bluetooth adapter,
+             * this method should always be called before attempting to connect to a
+             * remote device with connect(). Discovery is not managed by the Activity,
+             * but is run as a system service, so an application should always call
+             * cancel discovery even if it did not directly request a discovery, just to
+             * be sure. If Bluetooth state is not STATE_ON, this API will return false.
+             *
+             * see
+             * http://developer.android.com/reference/android/bluetooth/BluetoothAdapter
+             * .html#cancelDiscovery()
+             */
             Log.d(TAG, "Stopping Bluetooth discovery.");
             btAdapter.cancelDiscovery();
 
@@ -108,7 +110,7 @@ public class ObdGatewayService extends AbstractGatewayService {
      * <p/>
      * See http://stackoverflow.com/questions/18657427/ioexception-read-failed-socket-might-closed-bluetooth-on-android-4-3/18786701#18786701
      *
-     * @throws IOException
+     * @throws IOException when a bluetooth connection could not be established.
      */
     private void startObdConnection() throws IOException {
         Log.d(TAG, "Starting OBD connection..");
@@ -130,12 +132,12 @@ public class ObdGatewayService extends AbstractGatewayService {
         
         queueJob(new ObdCommandJob(new EchoOffCommand()));
 
-    /*
-     * Will send second-time based on tests.
-     *
-     * TODO this can be done w/o having to queue jobs by just issuing
-     * command.run(), command.getResult() and validate the result.
-     */
+        /*
+         * Will send second-time based on tests.
+         *
+         * TODO this can be done w/o having to queue jobs by just issuing
+         * command.run(), command.getResult() and validate the result.
+         */
         queueJob(new ObdCommandJob(new EchoOffCommand()));
         queueJob(new ObdCommandJob(new LineFeedOffCommand()));
         queueJob(new ObdCommandJob(new TimeoutCommand(62)));
@@ -169,7 +171,7 @@ public class ObdGatewayService extends AbstractGatewayService {
     /**
      * Runs the queue until the service is stopped
      */
-    protected void executeQueue() throws InterruptedException {
+    protected void executeQueue() {
         Log.d(TAG, "Executing queue..");
         while (!Thread.currentThread().isInterrupted()) {
             ObdCommandJob job = null;
@@ -200,11 +202,10 @@ public class ObdGatewayService extends AbstractGatewayService {
                 }
                 Log.d(TAG, "Command not supported. -> " + u.getMessage());
             } catch (IOException io) {
-                if (job != null) {
-                    if(io.getMessage().contains("Broken pipe"))
-                        job.setState(ObdCommandJobState.BROKEN_PIPE);
-                    else
-                        job.setState(ObdCommandJobState.EXECUTION_ERROR);
+                if(("" + io.getMessage()).contains("Broken pipe")) {
+                    job.setState(ObdCommandJobState.BROKEN_PIPE);
+                } else {
+                    job.setState(ObdCommandJobState.EXECUTION_ERROR);
                 }
                 Log.e(TAG, "IO error. -> " + io.getMessage());
             } catch (Exception e) {
@@ -241,7 +242,7 @@ public class ObdGatewayService extends AbstractGatewayService {
             try {
                 sock.close();
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
+                Log.e(TAG, "" + e.getMessage());
             }
 
         // kill service
@@ -259,12 +260,10 @@ public class ObdGatewayService extends AbstractGatewayService {
         emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{devemail});
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "OBD2 Reader Debug Logs");
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("\nManufacturer: ").append(Build.MANUFACTURER);
-        sb.append("\nModel: ").append(Build.MODEL);
-        sb.append("\nRelease: ").append(Build.VERSION.RELEASE);
-
-        emailIntent.putExtra(Intent.EXTRA_TEXT, sb.toString());
+        String sb = "\nManufacturer: " + Build.MANUFACTURER +
+                "\nModel: " + Build.MODEL +
+                "\nRelease: " + Build.VERSION.RELEASE;
+        emailIntent.putExtra(Intent.EXTRA_TEXT, sb);
 
         String fileName = "OBDReader_logcat_" + System.currentTimeMillis() + ".txt";
         File sdCard = Environment.getExternalStorageDirectory();
@@ -279,12 +278,10 @@ public class ObdGatewayService extends AbstractGatewayService {
             context.startActivity(Intent.createChooser(emailIntent, "Pick an Email provider").addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
 
             try {
-                @SuppressWarnings("unused")
                 Process process = Runtime.getRuntime().exec("logcat -f " + outputFile.getAbsolutePath());
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
-
 }

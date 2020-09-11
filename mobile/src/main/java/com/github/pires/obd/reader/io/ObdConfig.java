@@ -1,4 +1,4 @@
-package com.github.pires.obd.reader.config;
+package com.github.pires.obd.reader.io;
 
 import com.github.pires.obd.commands.ObdCommand;
 import com.github.pires.obd.commands.SpeedCommand;
@@ -38,6 +38,7 @@ import java.util.ArrayList;
 public final class ObdConfig {
 
     public static ArrayList<ObdCommand> getCommands() {
+
         ArrayList<ObdCommand> cmds = new ArrayList<>();
 
         // Control
@@ -86,8 +87,6 @@ public final class ObdConfig {
         // Misc
         cmds.add(new SpeedCommand());
 
-
         return cmds;
     }
-
 }
