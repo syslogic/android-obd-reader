@@ -13,6 +13,8 @@
 
 package com.github.pires.obd.reader.model;
 
+import androidx.annotation.NonNull;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,8 +32,7 @@ public class ObdReading {
         readings = new HashMap<>();
     }
 
-    public ObdReading(double latitude, double longitude, double altitude, long timestamp,
-                      String vin, Map<String, String> readings) {
+    public ObdReading(double latitude, double longitude, double altitude, long timestamp, String vin, Map<String, String> readings) {
         this.latitude = latitude;
         this.longitude = longitude;
         this.altitude = altitude;
@@ -88,6 +89,7 @@ public class ObdReading {
         this.readings = readings;
     }
 
+    @NonNull
     public String toString() {
 
         return "lat:" + latitude + ";" +

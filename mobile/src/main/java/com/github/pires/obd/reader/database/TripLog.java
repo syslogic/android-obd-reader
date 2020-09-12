@@ -14,9 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Some code taken from https://github.com/wdkapps/FillUp
- */
 public class TripLog {
 
     /// the database version number

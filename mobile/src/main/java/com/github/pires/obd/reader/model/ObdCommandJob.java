@@ -64,5 +64,4 @@ public class ObdCommandJob {
         QUEUE_ERROR,
         NOT_SUPPORTED
     }
-
 }

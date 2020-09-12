@@ -20,9 +20,6 @@ import roboguice.activity.RoboActivity;
 
 import static com.github.pires.obd.reader.activity.ConfirmDialog.createDialog;
 
-/**
- * Some code taken from https://github.com/wdkapps/FillUp
- */
 public class TripListActivity extends RoboActivity implements ConfirmDialog.Listener {
 
     private List<TripRecord> records;

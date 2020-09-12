@@ -5,9 +5,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 
-/**
- * Created by elagin on 19.03.15.
- */
 public class ConfirmDialog {
 
     public static final int DIALOG_CONFIRM_DELETE_ID = 1;
@@ -49,6 +46,6 @@ public class ConfirmDialog {
     }
 
     public interface Listener {
-        public void onConfirmationDialogResponse(int id, boolean confirmed);
+        void onConfirmationDialogResponse(int id, boolean confirmed);
     }
 }

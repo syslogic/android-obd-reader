@@ -5,9 +5,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-/**
- * Created by elagin on 13.03.15.
- */
 public class TripLogOpenHelper extends SQLiteOpenHelper {
 
     /// tag for logging

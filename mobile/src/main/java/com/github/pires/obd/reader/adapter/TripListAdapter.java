@@ -1,11 +1,14 @@
 package com.github.pires.obd.reader.adapter;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 import com.github.pires.obd.reader.R;
 import com.github.pires.obd.reader.model.TripRecord;
@@ -41,8 +44,10 @@ public class TripListAdapter extends ArrayAdapter<TripRecord> {
      *
      * @see android.widget.ArrayAdapter#getView(int, android.view.View, android.view.ViewGroup)
      */
+    @SuppressLint("SetTextI18n")
     @Override
-    public View getView(int position, View view, ViewGroup parent) {
+    @NonNull
+    public View getView(int position, View view, @NonNull ViewGroup parent) {
 
         // create a view for the row if it doesn't already exist
         if (view == null) {
@@ -66,11 +71,10 @@ public class TripListAdapter extends ArrayAdapter<TripRecord> {
         String rpmMax = String.valueOf(record.getEngineRpmMax());
 
         String engineRuntime = record.getEngineRuntime();
-        if (engineRuntime == null)
-            engineRuntime = "None";
-        rowEngine.setText("Engine Runtime: " + engineRuntime + "\tMax RPM: " + rpmMax);
+        if (engineRuntime == null) {engineRuntime = "None";}
 
-        rowOther.setText("Max speed: " + String.valueOf(record.getSpeedMax()));
+        rowEngine.setText("Engine Runtime: " + engineRuntime + "\tMax RPM: " + rpmMax);
+        rowOther.setText("Max speed: " + record.getSpeedMax());
         return view;
     }
 
@@ -81,33 +85,23 @@ public class TripListAdapter extends ArrayAdapter<TripRecord> {
         long diffHours = diff / (60 * 60 * 1000) % 24;
         long diffDays = diff / (24 * 60 * 60 * 1000);
 
-        StringBuffer res = new StringBuffer();
-
-        if (diffDays > 0)
-            res.append(diffDays + "d");
-
+        StringBuilder sb = new StringBuilder();
+        if (diffDays > 0) {
+            sb.append(diffDays + "d");
+        }
         if (diffHours > 0) {
-            if (res.length() > 0) {
-                res.append(" ");
-            }
-            res.append(diffHours + "h");
+            if (sb.length() > 0) {sb.append(" ");}
+            sb.append(diffHours + "h");
         }
-
         if (diffMinutes > 0) {
-            if (res.length() > 0) {
-                res.append(" ");
-            }
-            res.append(diffMinutes + "m");
+            if (sb.length() > 0) {sb.append(" ");}
+            sb.append(diffMinutes + "m");
         }
-
         if (diffSeconds > 0) {
-            if (res.length() > 0) {
-                res.append(" ");
-            }
-
-            res.append(diffSeconds + "s");
+            if (sb.length() > 0) {sb.append(" ");}
+            sb.append(diffSeconds + "s");
         }
-        return res.toString();
+        return sb.toString();
     }
 
     /**

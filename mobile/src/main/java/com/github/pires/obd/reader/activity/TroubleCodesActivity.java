@@ -13,7 +13,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,6 +20,9 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 
 import com.github.pires.obd.commands.control.TroubleCodesCommand;
 import com.github.pires.obd.commands.protocol.EchoOffCommand;
@@ -34,6 +36,7 @@ import com.github.pires.obd.exceptions.NoDataException;
 import com.github.pires.obd.exceptions.UnableToConnectException;
 import com.github.pires.obd.reader.R;
 import com.github.pires.obd.reader.utils.BluetoothManager;
+
 import com.google.inject.Inject;
 
 import java.io.IOException;
@@ -57,15 +60,16 @@ public class TroubleCodesActivity extends Activity {
     private static final int OBD_COMMAND_FAILURE_NODATA = 15;
     @Inject
     SharedPreferences prefs;
+
     private ProgressDialog progressDialog;
-    private String remoteDevice;
     private GetTroubleCodesTask gtct;
+
     private BluetoothDevice dev = null;
     private BluetoothSocket sock = null;
+
     private Handler mHandler = new Handler(new Handler.Callback() {
 
-
-        public boolean handleMessage(Message msg) {
+        public boolean handleMessage(@NonNull Message msg) {
              Log.d(TAG, "Message received on handler");
             switch (msg.what) {
                 case NO_BLUETOOTH_DEVICE_SELECTED:
@@ -126,7 +130,7 @@ public class TroubleCodesActivity extends Activity {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
-        remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
+        String remoteDevice = prefs.getString(ConfigActivity.BLUETOOTH_LIST_KEY, null);
         if (remoteDevice == null || "".equals(remoteDevice)) {
             Log.e(TAG, "No Bluetooth device has been selected.");
             mHandler.obtainMessage(NO_BLUETOOTH_DEVICE_SELECTED).sendToTarget();
@@ -152,17 +156,12 @@ public class TroubleCodesActivity extends Activity {
                 try {
                     sock = BluetoothManager.connect(dev);
                 } catch (Exception e) {
-                    Log.e(
-                            TAG,
-                            "There was an error while establishing connection. -> "
-                                    + e.getMessage()
-                    );
+                    Log.e(TAG,"There was an error while establishing connection. -> " + e.getMessage());
                     Log.d(TAG, "Message received on handler here");
                     mHandler.obtainMessage(CANNOT_CONNECT_TO_DEVICE).sendToTarget();
                     return true;
                 }
                 try {
-
                     Log.d("TESTRESET", "Trying reset");
                     //new ObdResetCommand().run(sock.getInputStream(), sock.getOutputStream());
                     ResetTroubleCodesCommand clear = new ResetTroubleCodesCommand();
@@ -191,7 +190,7 @@ public class TroubleCodesActivity extends Activity {
         String[] keys = getResources().getStringArray(keyId);
         String[] vals = getResources().getStringArray(valId);
 
-        Map<String, String> dict = new HashMap<String, String>();
+        Map<String, String> dict = new HashMap<>();
         for (int i = 0, l = keys.length; i < l; i++) {
             dict.put(keys[i], vals[i]);
         }
@@ -213,7 +212,7 @@ public class TroubleCodesActivity extends Activity {
         //TODO replace below codes (res) with aboce dtcVals
         //String tmpVal = dtcVals.get(res.split("\n"));
         //String[] dtcCodes = new String[]{};
-        ArrayList<String> dtcCodes = new ArrayList<String>();
+        ArrayList<String> dtcCodes = new ArrayList<>();
         //int i =1;
         if (res != null) {
             for (String dtcCode : res.split("\n")) {
@@ -223,13 +222,13 @@ public class TroubleCodesActivity extends Activity {
         } else {
             dtcCodes.add("There are no errors");
         }
-        ArrayAdapter<String> myarrayAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dtcCodes);
+        ArrayAdapter<String> myarrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, dtcCodes);
         lv.setAdapter(myarrayAdapter);
         lv.setTextFilterEnabled(true);
     }
 
 
-    public class ModifiedTroubleCodesObdCommand extends TroubleCodesCommand {
+    public static class ModifiedTroubleCodesObdCommand extends TroubleCodesCommand {
         @Override
         public String getResult() {
             // remove unwanted response from output since this results in erroneous error codes
@@ -237,14 +236,14 @@ public class TroubleCodesActivity extends Activity {
         }
     }
 
-    public class ClearDTC extends ResetTroubleCodesCommand {
+    public static class ClearDTC extends ResetTroubleCodesCommand {
         @Override
         public String getResult() {
             return rawData;
         }
     }
 
-
+    @Deprecated
     private class GetTroubleCodesTask extends AsyncTask<String, Integer, String> {
 
         @Override
@@ -303,78 +302,68 @@ public class TroubleCodesActivity extends Activity {
                 try {
                     // Let's configure the connection.
                     Log.d(TAG, "Queueing jobs for connection configuration..");
-
                     onProgressUpdate(1);
 
                     new ObdResetCommand().run(sock.getInputStream(), sock.getOutputStream());
-
-
                     onProgressUpdate(2);
 
                     new EchoOffCommand().run(sock.getInputStream(), sock.getOutputStream());
-
                     onProgressUpdate(3);
 
                     new LineFeedOffCommand().run(sock.getInputStream(), sock.getOutputStream());
-
                     onProgressUpdate(4);
 
                     new SelectProtocolCommand(ObdProtocols.AUTO).run(sock.getInputStream(), sock.getOutputStream());
-
                     onProgressUpdate(5);
 
                     ModifiedTroubleCodesObdCommand tcoc = new ModifiedTroubleCodesObdCommand();
                     tcoc.run(sock.getInputStream(), sock.getOutputStream());
                     result = tcoc.getFormattedResult();
-
                     onProgressUpdate(6);
 
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE_IO).sendToTarget();
                     return null;
                 } catch (InterruptedException e) {
                     e.printStackTrace();
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE_IE).sendToTarget();
                     return null;
                 } catch (UnableToConnectException e) {
                     e.printStackTrace();
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE_UTC).sendToTarget();
                     return null;
                 } catch (MisunderstoodCommandException e) {
                     e.printStackTrace();
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE_MIS).sendToTarget();
                     return null;
                 } catch (NoDataException e) {
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE_NODATA).sendToTarget();
                     return null;
                 } catch (Exception e) {
-                    Log.e("DTCERR", e.getMessage());
+                    Log.e("DTCERR", "" + e.getMessage());
                     mHandler.obtainMessage(OBD_COMMAND_FAILURE).sendToTarget();
                 } finally {
-
                     // close socket
                     closeSocket(sock);
                 }
-
             }
-
             return result;
         }
 
         public void closeSocket(BluetoothSocket sock) {
-            if (sock != null)
-                // close socket
+            if (sock != null) {
                 try {
                     sock.close();
                 } catch (IOException e) {
-                    Log.e(TAG, e.getMessage());
+                    Log.e(TAG, "" + e.getMessage());
                 }
+            }
         }
 
         @Override
@@ -386,12 +375,8 @@ public class TroubleCodesActivity extends Activity {
         @Override
         protected void onPostExecute(String result) {
             progressDialog.dismiss();
-
-
             mHandler.obtainMessage(DATA_OK, result).sendToTarget();
             setContentView(R.layout.fragment_trouble_codes);
-
         }
     }
-
 }

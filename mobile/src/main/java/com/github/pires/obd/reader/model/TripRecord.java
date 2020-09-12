@@ -30,8 +30,7 @@ public class TripRecord {
     }
 
     public void setSpeedMax(int value) {
-        if (this.speed < value)
-            speed = value;
+        if (this.speed < value) {speed = value;}
     }
 
     public void setSpeedMax(String value) {

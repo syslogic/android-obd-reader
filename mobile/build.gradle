@@ -39,6 +39,7 @@ android {
 dependencies {
 
     implementation "androidx.appcompat:appcompat:1.2.0"
+    implementation "androidx.preference:preference:1.1.1"
     implementation "com.github.pires:obd-java-api:1.0-RC16"
 
     // TODO: get rid of these:
